@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Organization {
+  id           String     @id @default(uuid())
+  name         String
+  logoUrl      String?
+  plan         String     @default("FREE")
+  settings     String?    // SQLite doesn't support Json well in older versions, using String
+  users        User[]
+  resources    Resource[]
+  tasks        Task[]
+  createdAt    DateTime   @default(now())
+}
+
+model User {
+  id           String        @id @default(uuid())
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id])
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         String        @default("STAFF")
+  department   String?
+  avatarUrl    String?
+  tasks        Task[]        @relation("Requester")
+  allocations  Allocation[]  @relation("AllocatedBy")
+  notifications Notification[]
+  createdAt    DateTime      @default(now())
+}
+
+model Resource {
+  id           String         @id @default(uuid())
+  orgId        String
+  organization Organization   @relation(fields: [orgId], references: [id])
+  name         String
+  type         String
+  status       String         @default("AVAILABLE")
+  skills       String?        // SQLite doesn't support scalar lists (String[]), using String for comma-separated
+  capacity     Int?
+  location     String?
+  department   String?
+  costPerHour  Float?         
+  availability String?        
+  constraints  String?        
+  tags         String?        
+  metadata     String?        
+  allocations  Allocation[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Task {
+  id                 String       @id @default(uuid())
+  orgId              String
+  organization       Organization @relation(fields: [orgId], references: [id])
+  requesterId        String
+  requester          User         @relation("Requester", fields: [requesterId], references: [id])
+  title              String
+  description        String?
+  priority           String       @default("MEDIUM")
+  status             String       @default("PENDING")
+  requiredType       String
+  requiredSkills     String?
+  requiredCapacity   Int?
+  requiredLocation   String?
+  preferredResourceId String?
+  startTime          DateTime
+  endTime            DateTime
+  deadline           DateTime?
+  autoAllocate       Boolean      @default(true)
+  allocations        Allocation[]
+  createdAt          DateTime     @default(now())
+}
+
+model Allocation {
+  id               String       @id @default(uuid())
+  taskId           String
+  task             Task         @relation(fields: [taskId], references: [id])
+  resourceId       String
+  resource         Resource     @relation(fields: [resourceId], references: [id])
+  allocatedById    String?
+  allocatedBy      User?        @relation("AllocatedBy", fields: [allocatedById], references: [id])
+  allocationMethod String       @default("MANUAL")
+  startTime        DateTime
+  endTime          DateTime
+  score            Float?
+  status           String       @default("ACTIVE")
+  notes            String?
+  conflicts1       Conflict[]   @relation("Conflict1")
+  conflicts2       Conflict[]   @relation("Conflict2")
+  createdAt        DateTime     @default(now())
+}
+
+model Conflict {
+  id            String     @id @default(uuid())
+  allocationId1 String
+  allocation1   Allocation @relation("Conflict1", fields: [allocationId1], references: [id])
+  allocationId2 String
+  allocation2   Allocation @relation("Conflict2", fields: [allocationId2], references: [id])
+  type          String
+  detectedAt    DateTime   @default(now())
+  resolvedAt    DateTime?
+  resolvedById  String?
+  resolutionNotes String?
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  orgId      String
+  actorId    String
+  action     String
+  entityType String
+  entityId   String
+  before     String?
+  after      String?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  actionUrl String?
+  createdAt DateTime @default(now())
+}
+
+model SavedReport {
+  id        String   @id @default(uuid())
+  orgId     String
+  createdBy String
+  name      String
+  type      String
+  config    String
+  schedule  String?
+  lastRunAt DateTime?
+  createdAt DateTime @default(now())
+}
