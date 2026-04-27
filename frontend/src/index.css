@@ -1,0 +1,80 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@theme {
+  --color-primary: #0F172A;
+  --color-accent: #6366F1;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-[#020617] text-slate-100 font-sans;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@utility glass {
+  @apply bg-slate-900/40 backdrop-blur-xl border border-white/10;
+}
+
+@utility glass-card {
+  @apply glass rounded-2xl shadow-2xl;
+}
+
+@utility glass-hover {
+  @apply transition-all duration-300 hover:bg-slate-800/60 hover:border-white/20;
+}
+
+@utility btn-primary {
+  @apply bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition-all active:scale-95 flex items-center gap-2;
+}
+
+@utility btn-secondary {
+  @apply glass hover:bg-white/10 text-white px-4 py-2 rounded-lg font-medium transition-all active:scale-95 flex items-center gap-2;
+}
+
+@utility input-field {
+  @apply glass bg-slate-950/50 border-white/10 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all;
+}
+
+@utility badge {
+  @apply px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-all;
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.neon-glow {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+}
+
+.emerald-glow {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
