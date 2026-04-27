@@ -1,0 +1,9 @@
+flask
+flask-cors
+pandas
+numpy
+scikit-learn
+ortools
+prophet
+requests
+python-dotenv
